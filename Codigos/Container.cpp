@@ -22,7 +22,7 @@ typedef produto queue_element;
 #include "Queue.h"
 
 
-//==================FUNÇÕES======================//
+//==================FUNÃ‡Ã•ES======================//
 void lerArquivo(int *, int *, Queue&);
 produto converteArqString(char[]);
 void calculaValor(listaProdutos&, listaProdutos&, Queue&, int);
@@ -40,9 +40,6 @@ int main()
 
     lerArquivo(&numProdutos, &tamContainer, fila);
 
-    listaProdutos atual;
-    listaProdutos principal;
-
 
     return 0;
 }
@@ -51,7 +48,7 @@ int main()
 //===============================================//
 
 
-//Ler e armazenar todas as informações necessárias
+//Ler e armazenar todas as informaÃ§Ãµes necessÃ¡rias
 void lerArquivo(int* numProdutos, int* tamContainer, Queue& fila)
 {
     char fraseArquivo[50];
@@ -77,13 +74,13 @@ void lerArquivo(int* numProdutos, int* tamContainer, Queue& fila)
     //Leitura do numero de produtos e tamanho do container
     fscanf(file, "%d %d", numProdutos, tamContainer);
 
-    //Leitura das informações de um produto
+    //Leitura das informaÃ§Ãµes de um produto
     for(int i = 0; i < 100; i++)
     {
         fscanf(file, "%s", fraseArquivo);
         produto prod;
 
-        //Função recebe uma linha do arquivo
+        //FunÃ§Ã£o recebe uma linha do arquivo
         //Ex. AAAAA, ProdX, 10, 100
         prod = converteArqString(fraseArquivo);
         insertQ(fila, prod);
@@ -95,7 +92,7 @@ void lerArquivo(int* numProdutos, int* tamContainer, Queue& fila)
 //===============================================//
 
 
-//Joga as informações dos produtos para a struct
+//Joga as informaÃ§Ãµes dos produtos para a struct
 produto converteArqString(char fraseArq[]){
 
     produto prod;
@@ -148,6 +145,6 @@ produto converteArqString(char fraseArq[]){
 //===============================================//
 
 
-//Função que calcula a maximização do lucro
+//FunÃ§Ã£o que calcula a maximizaÃ§Ã£o do lucro
 void calculaValor(listaProdutos& atual, listaProdutos& principal, Queue& fila, int tamContainer){
 }
