@@ -1,150 +1,249 @@
 #include <iostream>
+#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <fstream>
 using namespace std;
-
-#define MAX_PROD 100
-//Struct que armazena todos os produtos presentes
-typedef struct product{
-	char codigo[5];
-	char descricao[40];
-	int valor;
-	int peso;
-}produto;
-
-typedef struct {
-	produto prod[MAX_PROD];     //100 produtos
-	int valor = 0;              //Valor total
-	int peso = 0;               //Peso total
-	int n = 0;                  //Quantidade de produtos em prods
-}listaProdutos;
-typedef produto queue_element;
+typedef struct produto
+{
+    string codigo = "     ";
+    string descricao = "                    ";
+    int valor;
+    int peso;
+} produtos;
+typedef produtos queue_element;
 #include "Queue.h"
 
 
-//==================FUNÇÕES======================//
-void lerArquivo(int *, int *, Queue&);
-produto converteArqString(char[]);
-void calculaValor(listaProdutos&, listaProdutos&, Queue&, int);
-//===============================================//
-
+//==============================================================//
+void lerArquivo(Queue &, produtos[]);
+produto converteArqString(char []);
+int stoi(string);
+int calculaContainer(int, int, int[], int[], int []);
+void printQ(Queue);
+int valorTotal(Queue);
+int pesoTotal(Queue);
+//==============================================================//
 
 int main()
 {
-    //Declara e inicia a fila
+    //Declara��o da fila
     Queue fila;
     initQueue(fila);
 
-    //Capacidade e quantidade de produtos do container
-    int numProdutos, tamContainer;
+    //Declara��o da struct com no m�ximo de 100 produtos
+    produtos todosProds[100];
+    lerArquivo(fila, todosProds);
 
-    lerArquivo(&numProdutos, &tamContainer, fila);
 
-
+     //Printa todos os produtos escolhidos
+    cout << "PRODUTOS ESCOLHIDOS" << endl;
+    cout << "COD\t" << "DESCRICAO\t" << "VALOR\t" << "PESO" << endl;
+    printQ(fila);
+    cout << endl << endl << "VALOR TOTAL: USD " << valorTotal(fila) << endl;
+    cout << "PESO TOTAL: " << pesoTotal(fila) << "g";
     return 0;
 }
 
 
-//===============================================//
+//==============================================================//
 
 
-//Ler e armazenar todas as informações necessárias
-void lerArquivo(int* numProdutos, int* tamContainer, Queue& fila)
-{
-    char fraseArquivo[50];
-    int valor, peso;
-    char nomeArq[20];
-
-    cout << "Digite o nome do arquivo a ser lido: ";
-    cin >> nomeArq;
-    system("cls");
-
-    //Concatena com ".txt" para poder ler o arquivo
-    strcat(nomeArq, ".txt");
+void lerArquivo(Queue& fila, produtos prod[]){
+    char nomeArq[25], fraseArquivo[50];
+    int numProdutos, tamContainer;
+    int valor[100], peso[100], pos[100];
 
     FILE *file;
+    cout << "Digite o nome do arquivo desejado: ";
+    cin >> nomeArq;
+    system("cls");
+    strcat(nomeArq, ".txt");
     file = fopen(nomeArq, "r");
 
     if(file == NULL)
     {
+        produto p;
         printf("Erro na abertura do arquivo");
-        exit(0);
+        exit(1);
     }
 
-    //Leitura do numero de produtos e tamanho do container
-    fscanf(file, "%d %d", numProdutos, tamContainer);
+    //Pega numero de produtos e tamanho do Container
+    fscanf(file, "%d %d", &numProdutos, &tamContainer);
 
-    //Leitura das informações de um produto
+    //Pega o restante das informa��es do arquivo
     for(int i = 0; i < 100; i++)
     {
+        produto pr;
         fscanf(file, "%s", fraseArquivo);
-        produto prod;
-
-        //Função recebe uma linha do arquivo
-        //Ex. AAAAA, ProdX, 10, 100
-        prod = converteArqString(fraseArquivo);
-        insertQ(fila, prod);
+        pr = converteArqString(fraseArquivo);
+        peso[i] = pr.peso;
+        valor[i] = pr.valor;
+        prod[i] = pr;
     }
     fclose(file);
+
+    //Funcao para maximizar o lucro
+    int p = calculaContainer(tamContainer, numProdutos, peso, valor, pos);
+
+    for(; p>0; p--){
+        insertQ(fila, prod[pos[p-1]]);
+    }
+
 }
 
 
-//===============================================//
+//==============================================================//
 
 
-//Joga as informações dos produtos para a struct
-produto converteArqString(char fraseArq[]){
-
-    produto prod;
-    char valor[10];
-    char peso[10];
-    int i = 0, j = 0;
+produto converteArqString(char fraseArq[])
+{
+    produto p;
+    string peso="               ";
+    string valor="              ";
+    int i=0, j=0;
 
     //Pega o codigo do produto
-    for(i; fraseArq[i] != ','; i++){
-        prod.codigo[i] = fraseArq[i];
+    for(i; fraseArq[i]!=44; i++)
+    {
+        p.codigo[i] = fraseArq[i];
     }
     i++;
-    cout << prod.codigo << endl;
 
     //Pega a descricao do produto
-    for(i; fraseArq[i] != ','; i++){
-        prod.descricao[j] = fraseArq[i];
+    for(i; fraseArq[i] != 44; i++)
+    {
+        p.descricao[j] = fraseArq[i];
         j++;
     }
     i++;
-    //cout << prod.descricao << endl;
 
     //Pega o valor do produto
-    j = 0;
-    for(i; fraseArq[i] != ','; i++){
+    j=0;
+    for(i; fraseArq[i] != 44; i++)
+    {
         valor[j] = fraseArq[i];
         j++;
     }
     i++;
-    //cout << valor << endl;
 
     //Pega o peso do produto
-    j = 0;
-    for(i; i < strlen(fraseArq); i++){
+    j=0;
+    for(i; i < strlen(fraseArq); i++)
+    {
         peso[j] = fraseArq[i];
         j++;
     }
-    //cout << peso << endl;
 
-    //Converte peso e valor para inteiro
-    prod.valor = atoi(valor);
-    prod.peso = atoi(peso);
+    p.valor = stoi(valor);
+    p.peso = stoi(peso);
 
-
-    //cout << prod.codigo << "|" << prod.descricao << "|" << prod.valor << "|" << prod.peso << endl;
-    return prod;
+    return p;
 }
 
 
-//===============================================//
+//==============================================================//
 
 
-//Função que calcula a maximização do lucro
-void calculaValor(listaProdutos& atual, listaProdutos& principal, Queue& fila, int tamContainer){
+
+int stoi(string s)
+{
+    int n;
+    char aux[s.length()] ;
+    strcpy(aux, s.c_str());
+    sscanf(aux, "%d", &n);
+    return n;
+}
+
+
+//==============================================================//
+
+
+int calculaContainer(int tamContainer, int numProd, int peso[], int valor[], int pos[])
+{
+    int tam;
+    int** K = new int*[numProd+1];
+    for(int i = 0; i < numProd+1; i++)
+        K[i] = new int[tamContainer+1];
+
+    for (int i = 0; i <= numProd; i++)
+    {
+        for (tam = 0; tam <= tamContainer; tam++)
+        {
+            if (i == 0 || tam == 0)
+                K[i][tam] = 0;
+            else if (peso[i - 1] <= tam)
+                K[i][tam] = max(valor[i - 1] + K[i - 1][tam - peso[i - 1]], K[i - 1][tam]);
+            else
+                K[i][tam] = K[i - 1][tam];
+        }
+    }
+
+    int res = K[numProd][tamContainer];
+    int v=0;
+    tam = tamContainer;
+    for (int i = numProd; i > 0 && res > 0; i--)
+    {
+
+        if (res == K[i - 1][tam])
+            continue;
+        else
+        {
+
+            // This item is included.
+            pos[v]=i-1;
+            v++;
+
+            // Since this weight is included its
+            // value is deducted
+            res = res - valor[i - 1];
+            tam = tam - peso[i - 1];
+        }
+    }
+    return v;
+}
+
+
+//==============================================================//
+
+
+void printQ(Queue Q)
+{
+    produto x;
+    while(!isEmptyQ(Q))
+    {
+        x = eliminate(Q);
+        cout << x.codigo << "  " << x.descricao;
+        printf("%-6d%-6d\n",x.valor,x.peso);
+    }
+}
+
+
+//==============================================================//
+
+
+int valorTotal(Queue Q)
+{
+    int soma=0;
+    while(!isEmptyQ(Q))
+    {
+        produto Aux = eliminate(Q);
+        soma+=Aux.valor;
+    }
+    return soma;
+}
+
+
+//==============================================================//
+
+
+int pesoTotal(Queue Q)
+{
+    int soma = 0;
+    while(!isEmptyQ(Q))
+    {
+        produto aux = eliminate(Q);
+        soma = soma + aux.peso;
+    }
+    return soma;
 }
