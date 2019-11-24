@@ -27,11 +27,11 @@ int pesoTotal(Queue);
 
 int main()
 {
-    //Declaração da fila
+    //DeclaraÃ§Ã£o da fila
     Queue fila;
     initQueue(fila);
 
-    //Declaração da struct com no máximo de 100 produtos
+    //DeclaraÃ§Ã£o da struct com no mÃ¡ximo de 100 produtos
     produtos todosProds[100];
     lerArquivo(fila, todosProds);
 
@@ -63,7 +63,6 @@ void lerArquivo(Queue& fila, produtos prod[]){
 
     if(file == NULL)
     {
-        produto p;
         printf("Erro na abertura do arquivo");
         exit(1);
     }
@@ -71,7 +70,7 @@ void lerArquivo(Queue& fila, produtos prod[]){
     //Pega numero de produtos e tamanho do Container
     fscanf(file, "%d %d", &numProdutos, &tamContainer);
 
-    //Pega o restante das informações do arquivo
+    //Pega o restante das informaÃ§Ãµes do arquivo
     for(int i = 0; i < 100; i++)
     {
         produto pr;
@@ -209,12 +208,12 @@ int calculaContainer(int tamContainer, int numProd, int peso[], int valor[], int
 
 void printQ(Queue Q)
 {
-    produto x;
+    produto p;
     while(!isEmptyQ(Q))
     {
-        x = eliminate(Q);
-        cout << x.codigo << "  " << x.descricao;
-        printf("%-6d%-6d\n",x.valor,x.peso);
+        p = eliminate(Q);
+        cout << p.codigo << "  " << p.descricao;
+        printf("%-6d%-6d\n", p.valor, p.peso);
     }
 }
 
@@ -224,11 +223,11 @@ void printQ(Queue Q)
 
 int valorTotal(Queue Q)
 {
-    int soma=0;
+    int soma = 0;
     while(!isEmptyQ(Q))
     {
-        produto Aux = eliminate(Q);
-        soma+=Aux.valor;
+        produto p = eliminate(Q);
+        soma = soma + p.valor;
     }
     return soma;
 }
@@ -242,8 +241,8 @@ int pesoTotal(Queue Q)
     int soma = 0;
     while(!isEmptyQ(Q))
     {
-        produto aux = eliminate(Q);
-        soma = soma + aux.peso;
+        produto p = eliminate(Q);
+        soma = soma + p.peso;
     }
     return soma;
 }
